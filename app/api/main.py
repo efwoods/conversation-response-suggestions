@@ -47,6 +47,7 @@ async def haiku(prompt: str = Form("If I had to write a haiku, it would be:")):
     """
     
     inputs = tokenizer(prompt, return_tensors="pt")
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
     generate_ids = model.generate(inputs.input_ids, max_length=256, do_sample=True, temperature=0.6)
     result = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
     
@@ -91,7 +92,8 @@ async def suggest(
     prompt = processor.apply_chat_template(messages, add_generation_prompt=True)
 
     # Tokenize the prompt
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+    inputs = tokenizer(prompt, return_tensors="pt")
+    inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
     # Generate response
     generate_ids = model.generate(
